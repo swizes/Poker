@@ -22,7 +22,7 @@ class Decision(DecisionBase):
     def __init__(self, t, h, p, logger, l):
         t.bigBlind = float(p.selected_strategy['bigBlind'])
         t.smallBlind = float(p.selected_strategy['smallBlind'])
-
+        logger.debug("Strategy's Blinds are " + str(t.smallBlind) + " and " + str(t.bigBlind))
         t.bigBlindMultiplier = t.bigBlind / 0.02
 
         self.preflop_adjustment= -float(p.selected_strategy['pre_flop_equity_reduction_by_position']) * t.position_utg_plus

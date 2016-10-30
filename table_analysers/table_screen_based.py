@@ -263,6 +263,31 @@ class TableScreenBased(Table):
                 return False
         return True
 
+    def get_blinds(self, p):
+        self.logger.debug(str(p.selected_strategy['pokerSite']))
+        if p.selected_strategy['pokerSite'] == 'PPSNG':
+
+            func_dict = self.coo[inspect.stack()[0][3]][self.tbl]
+            self.gui_signals.signal_progressbar_increase.emit(5)
+            self.gui_signals.signal_status.emit("Get Big Blind")
+            self.logger.debug("Get big blind")
+
+            pil_image = self.crop_image(self.entireScreenPIL, self.tlc[0] + func_dict['x1'],
+                                        self.tlc[1] + func_dict['y1'],
+                                        self.tlc[0] + func_dict['x2'], self.tlc[1] + func_dict['y2'])
+
+            blinds = self.get_ocr_float_blind(pil_image, 'BigBlind')
+            if blinds[0] == 0:
+                return True
+            else:
+                self.logger.debug("Big Blind: " + blinds[0] + "  " + "Small Blind:  " + blinds[1])
+                p.selected_strategy['smallBlind'] = blinds[0]
+                p.selected_strategy['bigBlind'] = blinds[1]
+        else:
+            self.logger.info("Wrong strategy to get big blind. It works only in PP_SNG")
+
+        return True
+
     def get_my_cards(self, h):
         func_dict = self.coo[inspect.stack()[0][3]][self.tbl]
 

@@ -171,11 +171,101 @@ class Table(object):
         # plt.show()
         return count, points, bestFit, min_val
 
+    def get_ocr_float_blind(self, img_orig, name, force_method=0):
+        def fix_number(t):
+            t = t.replace("I", "1").replace("Â°lo", "").replace("O", "0").replace("o", "0") \
+                .replace("-", ".").replace("D", "0").replace("I", "1").replace("_", ".").replace("-", ".") \
+                .replace("B", "8").replace("S", "5")
+            t = re.sub("[^0123456789\.]", "", t)
+            try:
+                if t[0] == ".": t = t[1:]
+            except:
+                pass
+            try:
+                if t[-1] == ".": t = t[0:-1]
+            except:
+                pass
+            try:
+                if t[-1] == ".": t = t[0:-1]
+            except:
+                pass
+            try:
+                if t[-1] == "-": t = t[0:-1]
+            except:
+                pass
+            return t
+
+        try:
+            img_orig.save('pics/ocr_debug_' + name + '.png')
+        except:
+            self.logger.warning("Coulnd't safe debugging anan png file for ocr")
+
+        basewidth = 300
+        wpercent = (basewidth / float(img_orig.size[0]))
+        hsize = int((float(img_orig.size[1]) * float(wpercent)))
+        img_resized = img_orig.resize((basewidth, hsize), Image.ANTIALIAS)
+
+        img_min = img_resized.filter(ImageFilter.MinFilter)
+        img_med = img_resized.filter(ImageFilter.MedianFilter)
+        img_mod = img_resized.filter(ImageFilter.ModeFilter).filter(ImageFilter.SHARPEN)
+
+        lst = []
+        # try:
+        #    lst.append(pytesseract.image_to_string(img_orig, none, false,"-psm 6"))
+        # except exception as e:
+        #    self.logger.error(str(e))
+
+        if force_method == 0:
+            try:
+                lst.append(pytesseract.image_to_string(img_min, None, False, "-psm 6"))
+            except Exception as e:
+                self.logger.warning(str(e))
+                try:
+                    self.entireScreenPIL.save('pics/err_debug_fullscreen.png')
+                except:
+                    self.logger.warning("Coulnd't safe debugging png anan  file for ocr")
+                    # try:
+                    #    lst.append(pytesseract.image_to_string(img_med, None, False, "-psm 6"))
+                    # except Exception as e:
+                    #    self.logger.error(str(e))
+
+        try:
+            if force_method == 1 or fix_number(lst[0]) == '':
+                lst.append(pytesseract.image_to_string(img_mod, None, False, "-psm 6"))
+        except Exception as e:
+            self.logger.warning(str(e))
+            try:
+                self.entireScreenPIL.save('pics/err_debug_fullscreen.png')
+            except:
+                self.logger.warning("Coulnd't safe debugging png anan file for ocr")
+
+        try:
+            final_value = ''
+            for i, j in enumerate(lst):
+                self.logger.debug("OCR of " + name + " method " + str(i) + ": " + str(j))
+                string = str(j)
+
+            blinds = re.findall("[-+]?\d+[\.]?\d*[eE]?[-+]?\d*", string)
+            self.logger.info(name + " FINAL VALUE BLINDS: " + blinds[0] + " and " + blinds[1])
+
+            return blinds
+
+        except Exception as e:
+            #returns blinds as 0 if exception occurs and the 0 blind will not be passed to the strategy in get_blinds function
+            self.logger.warning("Pytesseract Error in recognising " + name)
+            self.logger.warning(str(e))
+            blinds = [0,0]
+            try:
+                self.entireScreenPIL.save('pics/err_debug_fullscreen.png')
+            except:
+                pass
+            return blinds
+
     def get_ocr_float(self, img_orig, name, force_method=0):
         def fix_number(t):
             t = t.replace("I", "1").replace("Â°lo", "").replace("O", "0").replace("o", "0") \
-                .replace("-", ".").replace("D", "0").replace("I", "1").replace("_", ".").replace("-", ".").replace("B",
-                                                                                                                   "8")
+                .replace("-", ".").replace("D", "0").replace("I", "1").replace("_", ".").replace("-", ".")\
+                .replace("B","8").replace("Z","2")
             t = re.sub("[^0123456789\.]", "", t)
             try:
                 if t[0] == ".": t = t[1:]
@@ -242,11 +332,11 @@ class Table(object):
         try:
             final_value = ''
             for i, j in enumerate(lst):
-                self.logger.debug("OCR of " + name + " method " + str(i) + ": " + str(j))
+                self.logger.critical("OCR of " + name + " method " + str(i) + ": " + str(j))
                 lst[i] = fix_number(lst[i]) if lst[i] != '' else lst[i]
                 final_value = lst[i] if final_value == '' else final_value
 
-            self.logger.info(name + " FINAL VALUE: " + str(final_value))
+            self.logger.critical(name + " FINAL VALUE: " + str(final_value))
             return float(final_value)
 
         except Exception as e:

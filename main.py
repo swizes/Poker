@@ -92,6 +92,7 @@ class ThreadManager(threading.Thread):
                         t.get_table_cards(h) and \
                         t.upload_collusion_wrapper(p, h) and \
                         t.get_dealer_position() and \
+                        t.get_blinds(p) and \
                         t.get_snowie_advice(p, h) and \
                         t.check_fast_fold(h, p) and \
                         t.check_for_button() and \

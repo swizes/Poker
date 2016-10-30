@@ -152,13 +152,7 @@ class Evaluation(object):
         self.highestStraightcard = self.cards[np.arange(self.iterations), self.s_index]
 
     def get_flush(self):  # status: ok
-        self.suitCounts = (self.suits[:, :, None] == np.arange(1, 5)).sum(1)  # occurrences of each suit
-        self.maxsuit = np.argmax(self.suitCounts, axis=1) + 1
-        self.flush = np.choose(self.maxsuit - 1, self.suitCounts.T) >= 5
-        self.flushcards = self.suits == self.maxsuit[:, None]
-        self.sorted_flushcards = (np.sort(self.flushcards * self.cards * -1, axis=1) * -1)
-        self.sorted_5flushcards = np.delete(self.sorted_flushcards, [5, 6], axis=1)
-        multiplier = np.array([16, 8, 4, 2, 1])
+
         self.flushscore = np.sum(self.sorted_5flushcards * multiplier, axis=1)
 
     def get_straighflush(self):

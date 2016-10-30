@@ -9,7 +9,9 @@ class debug_logger(object):
             fh.setLevel(logging.DEBUG)
             fh2 = logging.handlers.RotatingFileHandler('log/pokerprogram_info_only.log', maxBytes=2000000, backupCount=0)
             fh2.setLevel(logging.INFO)
-            er = logging.handlers.RotatingFileHandler('log/errors.log', maxBytes=2000000, backupCount=0)
+            fh3 = logging.handlers.RotatingFileHandler('log/values.log', maxBytes=1000000, backupCount=10)
+            fh3.setLevel(logging.CRITICAL)
+            er = logging.handlers.RotatingFileHandler('log/errors.log', maxBytes=2000000, backupCount=2)
             er.setLevel(logging.WARNING)
             ch = logging.StreamHandler(sys.stdout)
             ch.setLevel(logging.WARNING)
@@ -21,4 +23,5 @@ class debug_logger(object):
             logger.addHandler(fh2)
             logger.addHandler(ch)
             logger.addHandler(er)
+            logger.addHandler(fh3)
         return logger

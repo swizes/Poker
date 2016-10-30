@@ -141,7 +141,8 @@ class UIActionAndSignals(QObject):
             "maxPotAdjustment": 100
         }
         self.p = p
-        self.pokersite_types = ['PP', 'PS2', 'SN']
+
+        self.pokersite_types=['PP', 'PS2','SN','PPSNG']
 
         self.ui = ui_main_window
         self.progressbar_value = 0
