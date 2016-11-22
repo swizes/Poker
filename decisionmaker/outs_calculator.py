@@ -20,22 +20,22 @@ class Outs_Calculator(object):
     def create_card_deck(self, oc):
         values = "23456789TJQKA"
         suites = "CDHS"
-        oc.deck = []
-        [oc.deck.append(x + y) for x in values for y in suites]
+        deck = []
+        [deck.append(x + y) for x in values for y in suites]
         # remove drawn cards
-        oc.deck = [elem for elem in oc.deck if elem not in oc.hand]
-        return oc.deck
+        deck = [elem for elem in deck if elem not in oc.hand]
+        return deck
 
     #creates a deck without bot cards and pocket cards
     def create_card_deck_for_reverse_table(self, oc):
         values = "23456789TJQKA"
         suites = "CDHS"
-        oc.deck = []
-        [oc.deck.append(x + y) for x in values for y in suites]
-        # remove drawn cards
-        oc.deck = [elem for elem in oc.deck if elem not in oc.hand]
-        oc.deck = [elem for elem in oc.deck if elem not in oc.bot_card]
-        return oc.deck
+        deck = []
+        [deck.append(x + y) for x in values for y in suites]
+        # remove used cards
+        deck = [elem for elem in deck if elem not in oc.hand]
+        deck = [elem for elem in deck if elem not in oc.bot_card]
+        return deck
 
     def calc_score(self, hand):  # assign a calc_score to the hand so it can be compared with other hands
         card_ranks_original = '23456789TJQKA'
@@ -149,7 +149,7 @@ class Outs_Calculator(object):
 
         return outs
 
-    def evaluate_hands_for_reverse_table(self, pocket, board, oc, bot_card):
+    def evaluate_hands_for_reverse_table(self, pocket, board,bot_card, oc ):
         oc.hand = pocket + board
         oc.board = board
         oc.pocket = pocket
@@ -159,7 +159,7 @@ class Outs_Calculator(object):
         oc.board_score, oc.board_cards, oc.board_result = oc.calc_score(oc.board)
         oc.hand_score, oc.hand_cards, oc.hand_result = oc.calc_score(oc.hand)
         oc.deck = self.create_card_deck_for_reverse_table(oc)
-        
+
         outs = self.calculate_outs(oc)
 
         return outs

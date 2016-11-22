@@ -1,0 +1,12 @@
+#If the gamestage is post-flop or post-turn overwrite the reversetable sheet without irrelevant cards
+if gameStage == flop or gameStage == turn
+oc = OutsCalculator()
+oc.hand = t.myCards + t.cardsOnTable
+#create a deck without bot cards and board cards in it
+deck = oc.create_card_deck(oc)
+	for cards in deck
+		outs = calculate_outs_for_reverse_table(cards,t.cardsOnTable,t.myCards,oc)
+		 if(outs > 0)
+			#put cards in reverse table sheet
+		else
+			do nothing, check for next cards
