@@ -26,6 +26,17 @@ class Outs_Calculator(object):
         oc.deck = [elem for elem in oc.deck if elem not in oc.hand]
         return oc.deck
 
+    #creates a deck without bot cards and pocket cards
+    def create_card_deck_for_reverse_table(self, oc):
+        values = "23456789TJQKA"
+        suites = "CDHS"
+        oc.deck = []
+        [oc.deck.append(x + y) for x in values for y in suites]
+        # remove drawn cards
+        oc.deck = [elem for elem in oc.deck if elem not in oc.hand]
+        oc.deck = [elem for elem in oc.deck if elem not in oc.bot_card]
+        return oc.deck
+
     def calc_score(self, hand):  # assign a calc_score to the hand so it can be compared with other hands
         card_ranks_original = '23456789TJQKA'
         original_suits = 'CDHS'
@@ -132,14 +143,29 @@ class Outs_Calculator(object):
         oc.pocket_score, oc.pocket_cards, oc.pocket_result = oc.calc_score(oc.pocket)
         oc.board_score, oc.board_cards, oc.board_result = oc.calc_score(oc.board)
         oc.hand_score, oc.hand_cards, oc.hand_result = oc.calc_score(oc.hand)
+        oc.deck = self.create_card_deck(oc)
 
+        outs = self.calculate_outs(oc)
+
+        return outs
+
+    def evaluate_hands_for_reverse_table(self, pocket, board, oc, bot_card):
+        oc.hand = pocket + board
+        oc.board = board
+        oc.pocket = pocket
+        oc.bot_card = bot_card
+
+        oc.pocket_score, oc.pocket_cards, oc.pocket_result = oc.calc_score(oc.pocket)
+        oc.board_score, oc.board_cards, oc.board_result = oc.calc_score(oc.board)
+        oc.hand_score, oc.hand_cards, oc.hand_result = oc.calc_score(oc.hand)
+        oc.deck = self.create_card_deck_for_reverse_table(oc)
+        
         outs = self.calculate_outs(oc)
 
         return outs
 
     def calculate_outs(self, oc):
         outs = 0
-        oc.deck = self.create_card_deck(oc)
 
         # Use functions to calculate outs
         outs_list = [0] * 4
@@ -148,8 +174,6 @@ class Outs_Calculator(object):
             self.get_flush_draw, self.get_open_straight_draw,
             self.get_gut_shot_straight_draw
         ]
-
-        #print(len(outs_rank))
 
         for i in range(0, len(outs_rank)):
             outs = outs_list[i] = outs_rank[i](oc)
